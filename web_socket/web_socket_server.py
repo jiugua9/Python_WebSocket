@@ -6,6 +6,18 @@ import json
 HOST = '127.0.0.1'
 PORT = 8989
 
+'''
+data:数据结构
+{
+    'send_client':'',           # 发送客户端id
+    'send_type':'',             # 发送类型：msg-聊天，new_connect-连接提示，client_count-连接数量
+    'msg':'',                   # 消息内容
+    'client_count':''           # 在线数量
+}
+
+'''
+
+
 # 处理消息
 def message_received(client, server, message):
     # if len(message) > 200:
@@ -35,6 +47,7 @@ def new_client(client, server):
 # 客户端断开连接
 def client_close(client, server,flag=True):
     if flag:
+        # 删除断开连接的客户端id
         client_set.discard(client['id'])
     data = {
         'send_client': client['id'],

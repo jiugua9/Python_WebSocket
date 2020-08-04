@@ -14,7 +14,7 @@
 <br>
 <br>
 
-<!--展示会话信息-->
+<!--发送框-->
 <form>
     <input type="text" placeholder="请输入要发送内容" style="height: 25px">
     <button type="button" style="height: 30px" onclick="send_msg()">发送</button>
@@ -23,7 +23,7 @@
 
 </body>
 <script>
-    var ws = new WebSocket('ws://127.0.0.1:8989')
+    var ws = new WebSocket('ws://127.0.0.1:8989');      //连接服务
     var client_id;           //客户端id
     ws.onopen = function () {
         $('#connect_info p').html('已连接');
