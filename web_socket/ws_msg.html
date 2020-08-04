@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>会话窗口</title>
+</head>
+<script type="text/javascript" src="./jquery-1.11.3.min.js"></script>
+<body>
+<!--连接提示信息-->
+<span id="connect_info"><p>未连接... </p><i></i></span>
+
+<!--展示会话信息-->
+<div id="msg_info" style="border:solid #0ba1f3;height: 300px;width: 500px;"></div>
+<br>
+<br>
+
+<!--展示会话信息-->
+<form>
+    <input type="text" placeholder="请输入要发送内容" style="height: 25px">
+    <button type="button" style="height: 30px" onclick="send_msg()">发送</button>
+</form>
+
+
+</body>
+<script>
+    var ws = new WebSocket('ws://127.0.0.1:8989')
+    var client_id;           //客户端id
+    ws.onopen = function () {
+        $('#connect_info p').html('已连接');
+        console.log('已连接')
+    }
+    ws.onclose = function () {
+        $('#connect_info p').html('连接已断开..');
+        $('#connect_info i').html('')
+    }
+    ws.onmessage = function (m) {
+
+        var msg = $.parseJSON(m.data);
+        var send_client = msg['send_client'];       // 客户端id
+        // 新连接消息
+        if(msg['send_type'] === 'new_connect'){
+            // 新连接消息
+            client_id = send_client
+            $('#connect_info i').html('游客' + send_client)
+
+        // 有客户端断开连接信息
+        }else if(msg['send_type'] === 'client_count'){
+            // 更新客户端连接数量
+            update_count(msg)
+
+        // 客户端消息
+        }else{
+            // 本客户端发送的消息
+            if(send_client === client_id){
+                var msg_str = '<span style="padding-left:300px;"><h4 style="display: inline">自己：</h4>' + msg['msg'] + '</span><br>'
+            }else{  // 其他客户端发送的消息
+                msg_str = '<span><h4 style="display: inline">游客'+ send_client +'：</h4>' + msg['msg'] + '</span><br>'
+            }
+            $('#msg_info').append(msg_str)
+        }
+    };
+
+    // 发送消息
+    function send_msg() {
+        var msg = $('input').val()
+        if(!msg){
+            alert('不能发送空白消息')
+            return false
+        }else{
+            ws.send(msg)
+            $('input').val('')
+        }
+    }
+
+    function update_count(msg) {
+        // 更新客户端连接数量
+        var client_count = msg['client_count']
+        $('#connect_info p').html('已连接，当前在线人数：' + client_count)
+    }
+
+</script>
+</html>
